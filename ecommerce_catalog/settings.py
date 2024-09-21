@@ -83,7 +83,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     # TODO : disable auth for vercel
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  
+        'rest_framework.permissions.AllowAny',
     ],
     # 'DEFAULT_AUTHENTICATION_CLASSES': (
     #     'api_auth.authenticate.CustomAuthentication',
