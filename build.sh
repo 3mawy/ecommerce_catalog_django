@@ -12,8 +12,7 @@ python3.9 -m pip install -r requirements.txt
 # Make migrations
 echo "Making migrations..."
 python3.9 manage.py makemigrations --noinput
-python3.9 manage.py migrate --noinput
-python3.9 manage.py seed --noinput
+
 
 # Collect staticfiles
 echo "Collect static..."
