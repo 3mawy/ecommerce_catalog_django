@@ -102,7 +102,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ecommerce_catalog.wsgi.application'
+WSGI_APPLICATION = 'ecommerce_catalog.wsgi.app'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
