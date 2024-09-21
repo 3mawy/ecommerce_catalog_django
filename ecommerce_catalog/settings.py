@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-sj467kt(ba34c0zm_&#uockqt+*&b+=gnn-yay6p)stuxer5ct
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['3mawy3.pythonanywhere.com', 'localhost']
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_HTTPONLY = True
@@ -177,6 +177,5 @@ ELASTICSEARCH_DSL = {
     'default': {
         'hosts': 'http://elasticsearch:9200',
         'http_auth': ('username', 'password')
-},
+    },
 }
-
