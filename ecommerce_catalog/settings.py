@@ -13,6 +13,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -56,7 +57,8 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # TODO : disable auth for vercel
+    # 'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -79,9 +81,13 @@ REST_FRAMEWORK = {
     'ORDERING_PARAM': 'sort',
     'DEFAULT_PAGINATION_CLASS': 'ecommerce_catalog.utils.custom_pagination.CustomPagination',
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'api_auth.authenticate.CustomAuthentication',
-    )
+    # TODO : disable auth for vercel
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  
+    ],
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'api_auth.authenticate.CustomAuthentication',
+    # )
 }
 
 ROOT_URLCONF = 'ecommerce_catalog.urls'
