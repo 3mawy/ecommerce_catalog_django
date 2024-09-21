@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "versel_deploymet/wsgi.py",
+      "src": "ecommerce_catalog/wsgi.py",
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
@@ -24,7 +24,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "versel_deploymet/wsgi.py"
+      "dest": "ecommerce_catalog/wsgi.py"
     }
   ]
 }
