@@ -22,12 +22,8 @@ class ProductViewSetTests(APITestCase):
             product_type=cls.product_type,
             sku="SP123",
             price=299.99,
-            stock_quantity=100,
+            stock=100,
             is_active=True,
-            weight=0.2,
-            length=15.0,
-            width=7.0,
-            height=0.8
         )
         cls.url = reverse('product-list')
         cls.detail_url = reverse('product-detail', kwargs={'pk': cls.product.id})  # URL for detail, update, and delete
@@ -51,7 +47,7 @@ class ProductViewSetTests(APITestCase):
             "categories": [self.category.id],
             "sku": "LP456",
             "price": 999.99,
-            "stock_quantity": 50,
+            "stock": 50,
             "is_active": True,
             "weight": 1.5,
             "length": 35.0,
@@ -70,7 +66,7 @@ class ProductViewSetTests(APITestCase):
             "categories": [self.category.id],
             "sku": "SP123",
             "price": 349.99,
-            "stock_quantity": 80,
+            "stock": 80,
             "is_active": True,
             "weight": 0.3,
             "length": 16.0,
@@ -85,7 +81,7 @@ class ProductViewSetTests(APITestCase):
     def test_partial_update_product(self):
         data = {
             "price": 279.99,
-            "stock_quantity": 90
+            "stock": 90
         }
         response = self.client.patch(self.detail_url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -1,10 +1,15 @@
 asgiref==3.8.1
+certifi==2024.8.30
 Django==4.2.14
 django-cors-headers==4.4.0
+django-elasticsearch-dsl==8.0
 django-extensions==3.2.3
 django-filter==24.3
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
+elastic-transport==8.15.0
+elasticsearch==8.15.0
+elasticsearch-dsl==8.15.2
 Faker==26.0.0
 gunicorn==22.0.0
 packaging==24.1
@@ -18,3 +23,4 @@ python-dateutil==2.9.0.post0
 six==1.16.0
 sqlparse==0.5.1
 typing_extensions==4.12.2
+urllib3==2.2.2

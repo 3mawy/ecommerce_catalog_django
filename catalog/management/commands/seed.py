@@ -1,35 +1,51 @@
+import string
+
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
+from django.db import transaction
+
 from catalog.models import Attribute, Category, ProductType, Product, ProductVariation, ProductImage, ProductAttribute
+from django.utils.text import slugify
 from faker import Faker
 import random
-from django.utils.text import slugify
 from django.core.files import File
 
 fake = Faker()
+existing_skus = set(ProductVariation.objects.values_list('sku', flat=True))
+
+
+def generate_unique_sku(existing_skus):
+    """Generate a unique SKU that does not conflict with existing SKUs."""
+    while True:
+        sku = ''.join(random.choices(string.ascii_uppercase + string.digits, k=12))
+        if sku not in existing_skus:
+            return sku
+
 
 class Command(BaseCommand):
     help = 'Seed the database with sample data'
 
+    @transaction.atomic
     def handle(self, *args, **kwargs):
         self.stdout.write(self.style.SUCCESS('Starting database seeding...'))
 
         # Create Attributes
-        attribute_types = [
-            {'name': 'Color', 'data_type': 'choice', 'choices': {'choices': ['Red', 'Blue', 'Green', 'Black', 'White']}},
-            {'name': 'Size', 'data_type': 'choice', 'choices': {'choices': ['Small', 'Medium', 'Large', 'Extra Large']}},
-            {'name': 'Weight', 'data_type': 'float', 'choices': None},
+        attributes = [
+            {'name': 'Color', 'data_type': 'choice',
+             'choices': {'choices': ['Red', 'Blue', 'Green', 'Black', 'White']}},
+            {'name': 'Size', 'data_type': 'choice',
+             'choices': {'choices': ['Small', 'Medium', 'Large', 'Extra Large']}},
             {'name': 'Available', 'data_type': 'boolean', 'choices': None},
-            {'name': 'Manufacture Date', 'data_type': 'date', 'choices': None},
+            {'name': 'Fast Shipping', 'data_type': 'boolean', 'choices': None},
         ]
-        for attr in attribute_types:
+        for attr in attributes:
             defaults = {
                 'data_type': attr['data_type'],
                 'choices': attr.get('choices')
             }
             Attribute.objects.update_or_create(name=attr['name'], defaults=defaults)
 
-        # Create ProductTypes first
+        # Create ProductTypes and associate with Attributes
         product_types = [
             {'name': 'Gadget', 'description': 'Electronic gadgets and devices', 'attributes': ['Color', 'Weight']},
             {'name': 'Apparel', 'description': 'Clothing and accessories', 'attributes': ['Size', 'Available']},
@@ -45,6 +61,7 @@ class Command(BaseCommand):
             product_type.attributes.set(attributes)
             product_type.save()
 
+        # Create Categories
         top_level_categories = [
             {'name': 'Electronics', 'slug': slugify('Electronics'), 'description': fake.text(), 'parent': None,
              'product_type': ProductType.objects.get(name='Gadget')},
@@ -104,13 +121,10 @@ class Command(BaseCommand):
                 'description': fake.text(),
                 'product_type': random.choice(ProductType.objects.all()),
                 'categories': random.sample(category_objects, k=random.randint(1, 3)),
-                'sku': fake.unique.ean13(),
+                'sku': generate_unique_sku(existing_skus),
                 'price': round(random.uniform(10, 1000), 2),
-                'stock_quantity': random.randint(1, 500),
-                'weight': round(random.uniform(0.1, 50.0), 2),
-                'length': round(random.uniform(1.0, 200.0), 2),
-                'width': round(random.uniform(1.0, 200.0), 2),
-                'height': round(random.uniform(1.0, 200.0), 2)
+                'stock': random.randint(1, 500),
+                'is_active': random.choice([True, False]),
             }
             categories = product.pop('categories')
             prod = Product.objects.create(**product)
@@ -125,6 +139,7 @@ class Command(BaseCommand):
                     'product': product,
                     'name': fake.word(),
                     'price': round(random.uniform(10, 1000), 2),
+                    'sku': generate_unique_sku(existing_skus) if random.choice([True, False]) else None,
                     'stock': random.randint(1, 100),
                     'attributes': {
                         'Color': random.choice(['Red', 'Blue', 'Green', 'Black', 'White']),
@@ -176,19 +191,35 @@ class Command(BaseCommand):
                 )
 
         # Create ProductAttributes
-        for product in product_objects:
-            attributes = [
-                {'product': product, 'attribute_type': random.choice(Attribute.objects.all()), 'value': fake.word()},
-                {'product': product, 'attribute_type': random.choice(Attribute.objects.all()),
-                 'value': round(random.uniform(0.1, 50.0), 2)},
-                {'product': product, 'attribute_type': random.choice(Attribute.objects.all()),
-                 'value': str(fake.date_this_decade())},
-                {'product': product, 'attribute_type': random.choice(Attribute.objects.all()), 'value': fake.boolean()},
-                # Add more attributes with different data types
-            ]
-            [ProductAttribute.objects.create(**attr) for attr in attributes]
-        self.stdout.write(self.style.SUCCESS('Database seeding completed.'))
+        attribute_data = {
+            'color': ['Red', 'Blue', 'Green', 'black', 'White'],
+            'size': ['Small', 'Medium', 'Large', 'extra large'],
+            'material': ['Cotton', 'Polyester', 'Wool', 'Leather'],
+            'weight': [round(random.uniform(0.1, 5.0), 2) for _ in range(10)],
+            'fast shipping': [fake.boolean() for _ in range(10)]
+        }
 
+        # Fetch all products and attributes
+        product_objects = Product.objects.all()
+        attribute_objects = Attribute.objects.all()
+
+        for product in product_objects:
+            # Create a list to store attributes for the current product
+            attributes = []
+            for attr_type, values in attribute_data.items():
+                if attribute_objects.filter(name=attr_type).exists():
+                    attribute = random.choice(attribute_objects.filter(name=attr_type))
+                    value = random.choice(values)
+                    attributes.append({
+                        'product': product,
+                        'attribute_type': attribute,
+                        'value': value
+                    })
+
+            # Create ProductAttribute objects
+            [ProductAttribute.objects.create(**attr) for attr in attributes]
+
+        self.stdout.write(self.style.SUCCESS('Database seeding completed.'))
         # Create a user
         username = 'testUser'
         password = 'testUser'

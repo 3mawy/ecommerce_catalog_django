@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'catalog',
     'django_filters',
-    'django_extensions'
+    'django_extensions',
+    'django_elasticsearch_dsl',
 ]
 
 MIDDLEWARE = [
@@ -76,7 +77,6 @@ REST_FRAMEWORK = {
     'ORDERING_PARAM': 'sort',
     'DEFAULT_PAGINATION_CLASS': 'ecommerce_catalog.utils.custom_pagination.CustomPagination',
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'api_auth.authenticate.CustomAuthentication',
     )
@@ -108,11 +108,14 @@ WSGI_APPLICATION = 'ecommerce_catalog.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'ecommerce'),
+        'NAME': os.getenv('POSTGRES_DATABASE', 'ecommerce'),
         'USER': os.getenv('POSTGRES_USER', 'ecommerce_user'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'ecommerce_password'),
-        'HOST': os.getenv('DATABASE_HOST', 'db'),
+        'HOST': os.getenv('POSTGRES_HOST', 'db'),
         'PORT': os.getenv('DATABASE_PORT', '5432'),
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
 # DATABASES = {
@@ -169,3 +172,11 @@ GRAPH_MODELS = {
     'all_applications': True,
     'graph_models': True,
 }
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'http://elasticsearch:9200',
+        'http_auth': ('username', 'password')
+},
+}
+

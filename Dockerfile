@@ -1,4 +1,3 @@
-# Dockerfile
 FROM python:3.9-slim
 
 # Set environment variables
@@ -8,13 +7,13 @@ ENV PYTHONUNBUFFERED 1
 # Set work directory
 WORKDIR /code
 
-# Install dependencies
+# Copy dependencies first to leverage Docker cache
 COPY requirements.txt /code/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Copy project
+# Copy project files
 COPY . /code/
 
-# Run Django server
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "ecommerce_catalog.wsgi:application"]
+# Use Django's development server for development
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

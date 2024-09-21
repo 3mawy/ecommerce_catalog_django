@@ -4,7 +4,7 @@ import logging
 import django_filters
 from django.db.models import Subquery, Q
 from django_filters import rest_framework as filters
-from catalog.models import Category, ProductType, Product, ProductVariation
+from catalog.models import Product, ProductVariation
 
 logger = logging.getLogger(__name__)
 

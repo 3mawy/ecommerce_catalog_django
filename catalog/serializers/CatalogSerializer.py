@@ -36,9 +36,3 @@ class ProductVariationSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'price', 'stock', 'attributes', 'image']
 
 
-class ProductAttributeSerializer(serializers.ModelSerializer):
-    attribute_type = AttributeSerializer(read_only=True)
-
-    class Meta:
-        model = ProductAttribute
-        fields = ['id', 'product', 'attribute_type', 'value']

@@ -1,18 +1,10 @@
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-
+from rest_framework.pagination import PageNumberPagination
 
 class CustomPagination(PageNumberPagination):
-    page_size = 12
+    page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
-    template = 'rest_framework/pagination/numbers.html'  # Template for rendering pagination controls
-
-    def get_ordering(self, request, queryset, view):
-        sort_field = request.query_params.get('sort', '')
-        if sort_field:
-            return [sort_field]
-        return ['id']
 
     def get_paginated_response(self, data):
         return Response({
@@ -25,5 +17,3 @@ class CustomPagination(PageNumberPagination):
                 'num_pages': self.page.paginator.num_pages,
             }
         })
-
-
